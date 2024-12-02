@@ -21,24 +21,26 @@ import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useCreateWorkspace } from "../api/use-create-workspace";
-import { createWorkspaceSchema } from "../schemas";
-import { useWorkspaceId } from "../hooks/use-workspace-id";
+import { useCreateProject } from "../api/use-create-project";
+import { createProjectSchema } from "../schemas";
+import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 
-interface CreateWorkspaceFormProps {
+interface CreateProjectFormProps {
   onCancel?: () => void;
 }
 
-const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
+const CreateProjectForm = ({ onCancel }: CreateProjectFormProps) => {
   const router = useRouter();
-  const { mutate, isPending } = useCreateWorkspace();
+  const workspaceId = useWorkspaceId();
+  const { mutate, isPending } = useCreateProject();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm<z.infer<typeof createWorkspaceSchema>>({
-    resolver: zodResolver(createWorkspaceSchema),
+  const form = useForm<z.infer<typeof createProjectSchema>>({
+    resolver: zodResolver(createProjectSchema),
     defaultValues: {
       name: "",
+      workspaceId,
     },
   });
 
@@ -49,7 +51,8 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
     }
   };
 
-  const onSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
+  const onSubmit = (values: z.infer<typeof createProjectSchema>) => {
+    console.log("values", values);
     const finalValues = {
       ...values,
       image: values.image instanceof File ? values.image : "",
@@ -60,7 +63,7 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
       {
         onSuccess: ({ data }) => {
           form.reset();
-          router.push(`/workspaces/${data.$id}`);
+          router.push(`/workspaces/${workspaceId}/projects/${data.$id}`);
         },
       }
     );
@@ -70,7 +73,7 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
     <Card className="w-full h-full border-none shadow-none">
       <CardHeader className="flex p-7">
         <CardTitle className="text-xl font-bold">
-          Create a new workspace
+          Create a new project
         </CardTitle>
       </CardHeader>
       <div className="px-7">
@@ -88,7 +91,7 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                   <FormItem>
                     <FormLabel htmlFor="name">Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter workspace name" {...field} />
+                      <Input placeholder="Enter project name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -179,8 +182,8 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
               >
                 Cancel
               </Button>
-              <Button type="submit" size={"lg"} disabled={isPending}>
-                Create Workspace
+              <Button size={"lg"} disabled={isPending}>
+                Create
               </Button>
             </div>
           </form>
@@ -190,4 +193,4 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
   );
 };
 
-export default CreateWorkspaceForm;
+export default CreateProjectForm;

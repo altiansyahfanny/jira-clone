@@ -4,7 +4,7 @@ import React, { Fragment } from "react";
 import { useWorkspaceId } from "../hooks/use-workspace-id";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, MoreVerticalIcon } from "lucide-react";
+import { ArrowLeftIcon, LoaderIcon, MoreVerticalIcon } from "lucide-react";
 import Link from "next/link";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { useGetMembers } from "@/features/members/api/use-get-members";
@@ -29,7 +29,7 @@ export const MembersList = () => {
     "destructive"
   );
 
-  const { data } = useGetMembers({ workspaceId });
+  const { data, isLoading } = useGetMembers({ workspaceId });
   const { mutate: deleteMember, isPending: isDeletingMember } =
     useDeleteMember();
   const { mutate: updateMember, isPending: isUpdatingMember } =
@@ -67,64 +67,76 @@ export const MembersList = () => {
         <DottedSeparator />
       </div>
       <CardContent className="p-7">
-        {data?.documents.map((member, index) => (
-          <Fragment key={member.$id}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <MemberAvatar
-                  name={member.name}
-                  className="size-10"
-                  fallbackClassName="text-lg"
-                />
-                <div className="flex flex-col">
-                  <p className="text-sm font-medium">{member.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {member.email}
-                  </p>
+        {isLoading ? (
+          <div className="flex justify-center">
+            <LoaderIcon className="size-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div>
+            {data?.documents.map((member, index) => (
+              <Fragment key={member.$id}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MemberAvatar
+                      name={member.name}
+                      className="size-10"
+                      fallbackClassName="text-lg"
+                    />
+                    <div className="flex flex-col">
+                      <p className="text-sm font-medium">{member.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {member.email}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <Button
+                        className="ml-auto"
+                        variant="secondary"
+                        size={"icon"}
+                      >
+                        <MoreVerticalIcon className="size-4 text-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="end">
+                      <DropdownMenuItem
+                        className="font-medium"
+                        onClick={() => {
+                          handleUpdateMember(member.$id, MemberRole.ADMIN);
+                        }}
+                        disabled={false}
+                      >
+                        Set as Administator
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="font-medium"
+                        onClick={() => {
+                          handleUpdateMember(member.$id, MemberRole.MEMBER);
+                        }}
+                        disabled={false}
+                      >
+                        Set as Member
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="font-medium text-amber-700"
+                        onClick={() => {
+                          handleDeleteMember(member.$id);
+                        }}
+                        disabled={false}
+                      >
+                        Remove {member.name}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button className="ml-auto" variant="secondary" size={"icon"}>
-                    <MoreVerticalIcon className="size-4 text-muted-foreground" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="end">
-                  <DropdownMenuItem
-                    className="font-medium"
-                    onClick={() => {
-                      handleUpdateMember(member.$id, MemberRole.ADMIN);
-                    }}
-                    disabled={false}
-                  >
-                    Set as Administator
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="font-medium"
-                    onClick={() => {
-                      handleUpdateMember(member.$id, MemberRole.MEMBER);
-                    }}
-                    disabled={false}
-                  >
-                    Set as Member
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="font-medium text-amber-700"
-                    onClick={() => {
-                      handleDeleteMember(member.$id);
-                    }}
-                    disabled={false}
-                  >
-                    Remove {member.name}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            {index < data.documents.length - 1 && (
-              <Separator className="my-2.5" />
-            )}
-          </Fragment>
-        ))}
+                {index < data.documents.length - 1 && (
+                  <Separator className="my-2.5" />
+                )}
+              </Fragment>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
