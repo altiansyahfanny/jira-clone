@@ -13,7 +13,6 @@ type RequestType = InferRequestType<
 >;
 
 export const useResetInviteCode = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
@@ -31,7 +30,6 @@ export const useResetInviteCode = () => {
     onSuccess: ({ data }) => {
       toast.success("Invive code reset");
 
-      router.refresh();
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
       queryClient.invalidateQueries({ queryKey: ["workspace", data.$id] });
     },

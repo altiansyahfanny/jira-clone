@@ -1,7 +1,5 @@
 import { getCurrent } from "@/features/auth/queries";
-import { getWorkspace } from "@/features/workspaces/queries";
 import { redirect } from "next/navigation";
-import React from "react";
 
 interface WorkspaceIdPageProps {
   params: {
@@ -13,9 +11,11 @@ const WorkspaceIdPage = async ({ params }: WorkspaceIdPageProps) => {
   const user = await getCurrent();
   if (!user) redirect("/sign-in");
 
-  const workspace = await getWorkspace({ workspaceId: params.workspaceId });
-
-  return <div>WorkspaceIdPage {JSON.stringify(workspace)}</div>;
+  return (
+    <div className="bg-blue-500">
+      <h1 className="bg-transparent">Workspace page</h1>
+    </div>
+  );
 };
 
 export default WorkspaceIdPage;

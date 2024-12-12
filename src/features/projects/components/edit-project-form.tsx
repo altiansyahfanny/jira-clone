@@ -68,19 +68,12 @@ const EditProjectForm = ({ onCancel, initialValues }: EditProjectFormProps) => {
       image: values.image instanceof File ? values.image : "",
     };
 
-    mutate(
-      {
-        form: finalValues,
-        param: {
-          projectId: initialValues.$id,
-        },
+    mutate({
+      form: finalValues,
+      param: {
+        projectId: initialValues.$id,
       },
-      {
-        onSuccess: () => {
-          form.reset();
-        },
-      }
-    );
+    });
   };
 
   const handleDelete = async () => {
@@ -95,8 +88,6 @@ const EditProjectForm = ({ onCancel, initialValues }: EditProjectFormProps) => {
       },
       {
         onSuccess: () => {
-          //   router.push("/");
-          //   router.refresh();
           window.location.href = `/workspaces/${initialValues.workspaceId}`;
         },
       }

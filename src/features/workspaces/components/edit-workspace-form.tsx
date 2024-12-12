@@ -79,19 +79,12 @@ const EditWorkspaceForm = ({
       image: values.image instanceof File ? values.image : "",
     };
 
-    mutate(
-      {
-        form: finalValues,
-        param: {
-          workspaceId: initialValues.$id,
-        },
+    mutate({
+      form: finalValues,
+      param: {
+        workspaceId: initialValues.$id,
       },
-      {
-        onSuccess: () => {
-          form.reset();
-        },
-      }
-    );
+    });
   };
 
   const handleDelete = async () => {
@@ -107,8 +100,6 @@ const EditWorkspaceForm = ({
       {
         onSuccess: () => {
           router.push("/");
-          router.refresh();
-          // window.location.href = "/";
         },
       }
     );
