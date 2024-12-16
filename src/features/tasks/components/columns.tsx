@@ -6,7 +6,6 @@ import { Task } from "../types";
 import { Button } from "@/components/ui/button";
 import { ProjectAvatar } from "@/features/projects/components/project-avatar";
 import { MemberAvatar } from "@/features/members/componentes/member-avatar";
-import { format } from "date-fns";
 import { TaskDate } from "./task-date";
 import { Badge } from "@/components/ui/badge";
 import { snakeCaseToTitleCase } from "@/lib/utils";
@@ -123,7 +122,6 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     id: "actions",
-
     cell: ({ row }) => {
       const id = row.original.$id;
       const projectId = row.original.projectId;
