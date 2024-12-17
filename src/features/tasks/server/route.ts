@@ -194,7 +194,7 @@ const app = new Hono()
         };
       });
 
-      return c.json({ data: populatedTasks });
+      return c.json({ data: { ...tasks, documents: populatedTasks } });
     }
   )
   .post(

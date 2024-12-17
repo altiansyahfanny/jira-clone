@@ -3,20 +3,20 @@
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LoaderIcon, PlusIcon } from "lucide-react";
-import React, { Fragment, use, useCallback, useState } from "react";
-import { useCreateTaskModal } from "../hooks/use-create-task-modal";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
-import { useGetTasks } from "../api/use-get-tasks";
+import { LoaderIcon, PlusIcon } from "lucide-react";
 import { useQueryState } from "nuqs";
-import { DataFilters } from "./data-filters";
-import { useTaskFilters } from "../hooks/use-task-filters";
-import { DataTable } from "./data-table";
-import { columns } from "./columns";
-import { DataKanban } from "./data-kanban";
-import { TaskStatus } from "../types";
+import { Fragment, useCallback } from "react";
 import { useBulkUpdateTasks } from "../api/use-bulk-update-tasks";
+import { useGetTasks } from "../api/use-get-tasks";
+import { useCreateTaskModal } from "../hooks/use-create-task-modal";
+import { useTaskFilters } from "../hooks/use-task-filters";
+import { TaskStatus } from "../types";
+import { columns } from "./columns";
 import { DataCalendar } from "./data-calendar";
+import { DataFilters } from "./data-filters";
+import { DataKanban } from "./data-kanban";
+import { DataTable } from "./data-table";
 
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean;
@@ -85,13 +85,19 @@ export const TaskViewSwitcher = ({
         ) : (
           <Fragment>
             <TabsContent value="table" className="mt-0">
-              <DataTable columns={columns} data={tasks ? tasks : []} />
+              <DataTable
+                columns={columns}
+                data={tasks?.documents ? tasks.documents : []}
+              />
             </TabsContent>
             <TabsContent value="kanban" className="mt-0">
-              <DataKanban data={tasks ? tasks : []} onChange={onKanbanChange} />
+              <DataKanban
+                data={tasks?.documents ? tasks.documents : []}
+                onChange={onKanbanChange}
+              />
             </TabsContent>
             <TabsContent value="calendar" className="mt-0">
-              <DataCalendar data={tasks ? tasks : []} />
+              <DataCalendar data={tasks?.documents ? tasks.documents : []} />
             </TabsContent>
           </Fragment>
         )}

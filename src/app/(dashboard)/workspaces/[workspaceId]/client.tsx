@@ -20,9 +20,8 @@ import { useGetWorkspaceAnalytic } from "@/features/workspaces/api/use-get-works
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { formatDistanceToNow } from "date-fns";
-import { PencilIcon, PlusIcon, SettingsIcon } from "lucide-react";
+import { PlusIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
-import React from "react";
 
 export const WorkspaceIdClient = () => {
   const workspaceId = useWorkspaceId();
@@ -37,8 +36,6 @@ export const WorkspaceIdClient = () => {
   const { data: members, isLoading: isLoadingMembers } = useGetMembers({
     workspaceId,
   });
-
-  const { open: createProject } = useCreateProjectModal();
 
   const isLoading =
     isLoadingAnalytics ||
@@ -55,8 +52,9 @@ export const WorkspaceIdClient = () => {
     <div className="h-full flex flex-col space-y-4">
       <Analytics data={analytics} />
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <TaskList data={tasks} />
+        <TaskList data={tasks.documents} total={tasks.total} />
         <ProjectList data={projects.documents} total={projects.total} />
+        <MemberList data={members.documents} total={members.total} />
       </div>
     </div>
   );
@@ -64,10 +62,10 @@ export const WorkspaceIdClient = () => {
 
 interface TaskListProps {
   data: Task[];
-  total?: number;
+  total: number;
 }
 
-export const TaskList = ({ data, total = 99 }: TaskListProps) => {
+export const TaskList = ({ data, total }: TaskListProps) => {
   const workspaceId = useWorkspaceId();
   const { open: createTask } = useCreateTaskModal();
   return (
@@ -120,24 +118,23 @@ interface ProjectListProps {
 }
 
 export const ProjectList = ({ data, total = 99 }: ProjectListProps) => {
-  const workspaceId = useWorkspaceId();
+  const { open: createProject } = useCreateProjectModal();
+
   return (
     <div className="flex flex-col gap-y-4 col-span-1">
       <div className="bg-white border rounded-lg p-4">
         <div className="flex items-center justify-between">
-          <p className="text-lg font-semibold">Members ({total})</p>
-          <Button variant={"secondary"} size={"icon"} asChild>
-            <Link href={`/workspaces/${workspaceId}/members`}>
-              <SettingsIcon className="size-4 text-neutral-400" />
-            </Link>
+          <p className="text-lg font-semibold">Projects ({total})</p>
+          <Button variant={"secondary"} size={"icon"} onClick={createProject}>
+            <PlusIcon className="size-4 text-neutral-400" />
           </Button>
         </div>
         <DottedSeparator className="my-4" />
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {data.map((project) => (
             <li key={project.$id}>
-              <Card className="shadow-none rounded-lg overflow-hidden">
-                <CardContent className="p-3 flex flex-col items-center gap-x-2">
+              <Card className="shadow-none rounded-lg hover:opacity-75 transition">
+                <CardContent className="p-4 flex items-center gap-x-2.5">
                   <ProjectAvatar
                     name={project.name}
                     image={project.imageUrl}
@@ -160,40 +157,39 @@ export const ProjectList = ({ data, total = 99 }: ProjectListProps) => {
 
 interface MemberListProps {
   data: Member[];
-  total?: number;
+  total: number;
 }
 
-export const MemberList = ({ data, total = 99 }: MemberListProps) => {
+export const MemberList = ({ data, total }: MemberListProps) => {
   const workspaceId = useWorkspaceId();
-  const { open: createTask } = useCreateTaskModal();
   return (
     <div className="flex flex-col gap-y-4 col-span-1">
       <div className="bg-white border rounded-lg p-4">
         <div className="flex items-center justify-between">
-          <p className="text-lg font-semibold">Projects ({total})</p>
-          <Button variant={"secondary"} size={"icon"} onClick={createTask}>
-            <PlusIcon className="size-4 text-neutral-400" />
+          <p className="text-lg font-semibold">Members ({total})</p>
+          <Button variant={"secondary"} size={"icon"} asChild>
+            <Link href={`/workspaces/${workspaceId}/members`}>
+              <SettingsIcon className="size-4 text-neutral-400" />
+            </Link>
           </Button>
         </div>
         <DottedSeparator className="my-4" />
-        <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ul className="grid grid-cols-1 lg:grid-cols-2 xxl:grid-cols-3 gap-4">
           {data.map((member) => (
             <li key={member.$id}>
-              <Link href={`/workspaces/${workspaceId}/members/${member.$id}`}>
-                <Card className="shadow-none rounded-lg hover:opacity-75 transition">
-                  <CardContent className="p-4 flex items-center gap-x-2.5">
-                    <MemberAvatar
-                      name={member.name}
-                      // image={member.}
-                      className="size-12"
-                      fallbackClassName="text-lg"
-                    />
-                    <p className="text-lg font-medium truncate">
+              <Card className="shadow-none rounded-lg overflow-hidden">
+                <CardContent className="p-4 flex flex-col items-center gap-x-2">
+                  <MemberAvatar name={member.name} className="size-12" />
+                  <div className="flex flex-col items-center overflow-hidden">
+                    <p className="text-lg font-medium line-clamp-1">
                       {member.name}
                     </p>
-                  </CardContent>
-                </Card>
-              </Link>
+                    <p className="text-sm text-muted-foreground line-clamp-1">
+                      {member.email}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </li>
           ))}
           <li className="text-sm text-muted-foreground text-center hidden first-of-type:block">
