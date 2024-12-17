@@ -8,7 +8,7 @@ import { Projects } from "./projects";
 
 export const Sidebar = () => {
   return (
-    <aside className="bg-neutral-100 p-4 w-full">
+    <aside className="bg-neutral-100 p-4 w-full min-h-full">
       <Link href="/">
         <Image src={"/logo.svg"} height={48} width={164} alt="logo" />
       </Link>

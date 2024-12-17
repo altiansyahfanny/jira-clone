@@ -7,7 +7,7 @@ import { ID, Query } from "node-appwrite";
 import { z } from "zod";
 import { createProjectSchema, updateProjectSchema } from "../schemas";
 import { Project } from "../types";
-import { endOfMonth, startOfMonth, sub, subMonths } from "date-fns";
+import { endOfMonth, startOfMonth, subMonths } from "date-fns";
 import { TaskStatus } from "@/features/tasks/types";
 
 const app = new Hono()
@@ -40,10 +40,11 @@ const app = new Hono()
         return c.json({ error: "Unauthorized" }, 401);
       }
 
-      const projects = await databases.listDocuments(DATABASE_ID, PROJECTS_ID, [
-        Query.equal("workspaceId", workspaceId),
-        Query.orderDesc("$createdAt"),
-      ]);
+      const projects = await databases.listDocuments<Project>(
+        DATABASE_ID,
+        PROJECTS_ID,
+        [Query.equal("workspaceId", workspaceId), Query.orderDesc("$createdAt")]
+      );
 
       return c.json({ data: projects });
     }
@@ -77,8 +78,6 @@ const app = new Hono()
           ID.unique(),
           image
         );
-
-        console.log("file : ", file);
 
         const arrayBuffer = await storage.getFilePreview(
           IMAGES_BUCKET_ID,
